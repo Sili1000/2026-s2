@@ -79,6 +79,66 @@ Construir y verificar una red virtual aislada dentro de una sola computadora Lin
 
 ## 5. Construcción
 
+### Namespaces
+
+Se crearon los dos nodos:
+
+```bash
+sudo ip netns add hostA
+sudo ip netns add hostB
+ip netns list
+```
+
+```text
+hostB
+hostA
+```
+
+Al mirar dentro de hostA con `sudo ip netns exec hostA ip link`, solo aparece un `lo` apagado:
+
+```text
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN
+```
+
+hostA no ve `eth0` ni ninguna interfaz del sistema principal. Eso es lo que hace un *network namespace*: le da a cada nodo su propia red (interfaces, direcciones, rutas y vecinos), separada del resto, aunque todos usan el mismo kernel Linux.
+
+### Par veth
+
+Se creó el "cable" virtual:
+
+```bash
+sudo ip link add vethA type veth peer name vethB
+```
+
+Al hacer `ip link` en el sistema principal aparecieron las dos puntas:
+
+```text
+3: vethB@vethA: <BROADCAST,MULTICAST,M-DOWN> ... state DOWN
+4: vethA@vethB: <BROADCAST,MULTICAST,M-DOWN> ... state DOWN
+```
+
+Aparecen en el sistema principal porque el comando se ejecutó ahí (no tenía `ip netns exec`). Un veth siempre se crea en pares y lo que entra por una punta sale por la otra.
+
+### Mover cada punta a su nodo
+
+```bash
+sudo ip link set vethA netns hostA
+sudo ip link set vethB netns hostB
+```
+
+Después de esto, en el `ip link` del sistema principal solo quedan `lo` y `eth0`. vethA y vethB desaparecieron de ahí porque una interfaz solo puede estar en un namespace a la vez.
+
+Dentro de cada nodo:
+
+```text
+hostA:  4: vethA@if3: <BROADCAST,MULTICAST> ... state DOWN ... link-netns hostB
+hostB:  3: vethB@if4: <BROADCAST,MULTICAST> ... state DOWN ... link-netns hostA
+```
+
+vethA dice que su pareja es la interfaz 3 y que está en hostB; vethB dice que su pareja es la 4 y está en hostA, así que el cable une los dos nodos. Antes se veía `vethA@vethB` y ahora `vethA@if3`: desde dentro de hostA ya no se puede ver el nombre de vethB porque está en otro namespace.
+
+Todas las interfaces están en `DOWN` y sin dirección IP; eso se configura en los siguientes pasos.
+
 ## 6. Verificación
 
 ### Interfaces
