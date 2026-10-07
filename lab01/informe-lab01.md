@@ -174,7 +174,39 @@ Todas las interfaces están en `DOWN` y sin dirección IP; eso se configura en l
 
 ### Interfaces
 
+Antes de encender las interfaces, la tabla de rutas de hostA estaba vacía (`sudo ip netns exec hostA ip route` no mostró nada), aunque vethA ya tenía dirección.
+
+Se encendieron las interfaces en cada nodo:
+
+```bash
+sudo ip netns exec hostA ip link set lo up
+sudo ip netns exec hostA ip link set vethA up
+sudo ip netns exec hostB ip link set lo up
+sudo ip netns exec hostB ip link set vethB up
+```
+
+Resultado:
+
+```text
+hostA:  4: vethA@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> ... state UP
+hostB:  3: vethB@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> ... state UP
+```
+
+`UP` significa que la interfaz fue habilitada; `LOWER_UP` significa que hay enlace, y en un veth eso solo pasa cuando las dos puntas están encendidas. El `lo` queda en `state UNKNOWN`, que es normal en loopback.
+
+**Diferencia entre interfaz existente, direccionada y UP:**
+
+| Etapa | Qué tenía | ¿Podía comunicarse? |
+|---|---|---|
+| Existente | Solo la interfaz y su MAC | No |
+| Direccionada | Interfaz + IP | No, seguía en `DOWN` y sin ruta |
+| UP | Interfaz + IP + encendida | Sí |
+
+Una interfaz necesita las tres cosas: existir, tener dirección y estar en `UP`.
+
 ### Direcciones
+
+Las direcciones `10.10.1.1/30` y `10.10.1.2/30` se verificaron en la sección 4 (Direccionamiento).
 
 ### Rutas
 
