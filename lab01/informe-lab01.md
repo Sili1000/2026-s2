@@ -229,6 +229,24 @@ Como no existe ruta `default`, ningún nodo puede llegar a internet: solo conoce
 
 ### Vecinos
 
+Antes del ping, la tabla de vecinos de hostA estaba vacía (`sudo ip netns exec hostA ip neigh` no mostró nada). Después del ping:
+
+```text
+hostA:  10.10.1.2 dev vethA lladdr 8a:10:55:bd:37:45 STALE
+hostB:  10.10.1.1 dev vethB lladdr 66:86:98:1d:54:9f STALE
+```
+
+**Actividad 4:**
+
+| Nodo | IP del vecino | MAC observada | Estado |
+|---|---|---|---|
+| hostA | `10.10.1.2` | `8a:10:55:bd:37:45` | `STALE` |
+| hostB | `10.10.1.1` | `66:86:98:1d:54:9f` | `STALE` |
+
+Las MAC coinciden con las de vethB y vethA vistas en la construcción. El estado es `STALE` porque pasaron unos segundos desde el ping; con más tráfico vuelve a `REACHABLE`.
+
+En un enlace Ethernet los paquetes IP viajan dentro de tramas que van dirigidas a una MAC, no a una IP. Por eso, antes del primer ping, hostA tuvo que preguntar por ARP cuál era la MAC de `10.10.1.2`. Esa respuesta es la que queda guardada en la tabla de vecinos.
+
 ### Conectividad
 
 ## 7. Captura y análisis de tráfico
