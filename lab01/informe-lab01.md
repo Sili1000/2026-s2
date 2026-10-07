@@ -210,6 +210,23 @@ Las direcciones `10.10.1.1/30` y `10.10.1.2/30` se verificaron en la sección 4 
 
 ### Rutas
 
+Sin agregar ninguna ruta manual, cada nodo tiene una sola ruta:
+
+```text
+hostA:  10.10.1.0/30 dev vethA proto kernel scope link src 10.10.1.1
+hostB:  10.10.1.0/30 dev vethB proto kernel scope link src 10.10.1.2
+```
+
+**Actividad 3:**
+
+1. **Ruta en hostA:** `10.10.1.0/30` por `vethA`, con origen `10.10.1.1`.
+2. **Ruta en hostB:** `10.10.1.0/30` por `vethB`, con origen `10.10.1.2`.
+3. **Por qué apareció:** Linux la crea solo (`proto kernel`) cuando la interfaz tiene dirección y está `UP`. Antes de encender vethA la tabla estaba vacía; después de encenderla apareció. Es el mismo tipo de ruta que `172.24.128.0/20 dev eth0` en el sistema principal.
+4. **Interfaz para llegar al otro nodo:** `10.10.1.2` está dentro de `10.10.1.0/30`, así que hostA usa `vethA`; hostB usa `vethB` para llegar a `10.10.1.1`.
+5. **¿Hace falta gateway?** No. Los dos nodos están en la misma red `10.10.1.0/30` y unidos directamente por el veth (`scope link`, sin `via`). Un gateway solo se necesita para llegar a redes que no están directamente conectadas.
+
+Como no existe ruta `default`, ningún nodo puede llegar a internet: solo conocen su propia red.
+
 ### Vecinos
 
 ### Conectividad
