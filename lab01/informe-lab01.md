@@ -267,6 +267,44 @@ Hay conectividad en los dos sentidos.
 
 ## 7. Captura y análisis de tráfico
 
+Antes de capturar se vació la tabla de vecinos de los dos nodos, para que el ping tuviera que hacer ARP de nuevo:
+
+```bash
+sudo ip netns exec hostA ip neigh flush all
+sudo ip netns exec hostB ip neigh flush all
+```
+
+En una terminal se capturó en hostA y en otra se hizo ping desde hostB:
+
+```bash
+sudo ip netns exec hostA tcpdump -n -i vethA
+sudo ip netns exec hostB ping -c 4 10.10.1.1
+```
+
+Captura:
+
+```text
+17:38:23.002984 ARP, Request who-has 10.10.1.1 tell 10.10.1.2, length 28
+17:38:23.003004 ARP, Reply 10.10.1.1 is-at 66:86:98:1d:54:9f, length 28
+17:38:23.003007 IP 10.10.1.2 > 10.10.1.1: ICMP echo request, id 1228, seq 1, length 64
+17:38:23.003102 IP 10.10.1.1 > 10.10.1.2: ICMP echo reply, id 1228, seq 1, length 64
+...
+17:38:26.063252 IP 10.10.1.2 > 10.10.1.1: ICMP echo request, id 1228, seq 4, length 64
+17:38:26.063274 IP 10.10.1.1 > 10.10.1.2: ICMP echo reply, id 1228, seq 4, length 64
+17:38:28.143477 ARP, Request who-has 10.10.1.2 tell 10.10.1.1, length 28
+17:38:28.143526 ARP, Reply 10.10.1.2 is-at 8a:10:55:bd:37:45, length 28
+12 packets captured
+```
+
+**Actividad 5 — secuencia observada:**
+
+1. **ARP Request:** hostB pregunta quién tiene `10.10.1.1`. Lo envía a todos (broadcast) porque todavía no conoce ninguna MAC.
+2. **ARP Reply:** hostA responde con su MAC `66:86:98:1d:54:9f` (la de vethA).
+3. **ICMP Echo Request / Echo Reply:** 4 pares, uno por segundo. Cada request tiene su reply con el mismo `seq`; el `id 1228` es el mismo porque son del mismo comando ping.
+4. **ARP al final:** unos 5 segundos después, hostA pregunta por `10.10.1.2`. hostA había aprendido la MAC de hostB a partir de su pregunta, sin confirmarla; este ARP sirve para verificarla.
+
+El ARP aparece antes del ping porque sin la MAC del destino no se puede armar la trama Ethernet que lleva el paquete IP.
+
 ## 8. Falla y diagnóstico
 
 ## 9. Uso de OpenCode
