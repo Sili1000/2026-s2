@@ -77,6 +77,37 @@ Construir y verificar una red virtual aislada dentro de una sola computadora Lin
 | Host A | `hostA` | `vethA` | `10.10.1.1/30` |
 | Host B | `hostB` | `vethB` | `10.10.1.2/30` |
 
+Comandos usados:
+
+```bash
+sudo ip netns exec hostA ip addr add 10.10.1.1/30 dev vethA
+sudo ip netns exec hostB ip addr add 10.10.1.2/30 dev vethB
+```
+
+Verificación con `ip addr` dentro de cada nodo:
+
+```text
+hostA:  inet 10.10.1.1/30 scope global vethA
+hostB:  inet 10.10.1.2/30 scope global vethB
+```
+
+Las dos interfaces ya tienen dirección, pero siguen en `state DOWN`: tener IP no significa que la interfaz esté encendida.
+
+### Cálculo de la red 10.10.1.0/30 (Actividad 2)
+
+Con `/30` quedan 2 bits para hosts, así que la red tiene 2² = 4 direcciones:
+
+| Dirección | Función |
+|---|---|
+| `10.10.1.0` | Dirección de red |
+| `10.10.1.1` | Utilizable (hostA) |
+| `10.10.1.2` | Utilizable (hostB) |
+| `10.10.1.3` | Broadcast |
+
+Direcciones utilizables: 4 − 2 = **2**.
+
+`10.10.1.1` y `10.10.1.2` pueden estar en el mismo enlace porque comparten los primeros 30 bits, es decir, pertenecen a la misma red `10.10.1.0/30`. Solo cambian los 2 últimos bits (`01` y `10`), que son la parte de host. Por eso se pueden comunicar directamente sin router. Un `/30` es justo lo necesario para un enlace punto a punto entre dos equipos.
+
 ## 5. Construcción
 
 ### Namespaces
