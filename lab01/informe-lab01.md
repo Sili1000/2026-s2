@@ -307,6 +307,63 @@ El ARP aparece antes del ping porque sin la MAC del destino no se puede armar la
 
 ## 8. Falla y diagnóstico
 
+### 1. Predicción previa
+
+Antes de apagar vethB se anotó lo que se esperaba:
+
+- El ping de hostA a hostB **no** va a funcionar, porque vethB tiene que estar encendida.
+- La ruta de hostB: sin predicción.
+- vethA en hostA va a seguir con `LOWER_UP`.
+
+### 2. Síntoma observado
+
+```bash
+sudo ip netns exec hostB ip link set vethB down
+sudo ip netns exec hostA ping -c 4 10.10.1.2
+```
+
+```text
+From 10.10.1.1 icmp_seq=1 Destination Host Unreachable
+...
+4 packets transmitted, 0 received, +4 errors, 100% packet loss
+```
+
+El mensaje viene de `10.10.1.1`, o sea del propio hostA: no consiguió la MAC de hostB por ARP y declaró el destino inalcanzable.
+
+### 3. Comandos de diagnóstico y resultados
+
+| Nodo | Comando | Resultado | Interpretación |
+|---|---|---|---|
+| hostA | `ip link` | `vethA: <NO-CARRIER,...,UP> state DOWN` | vethA está encendida pero no hay nadie al otro lado |
+| hostA | `ip addr` | `inet 10.10.1.1/30` | La IP sigue configurada |
+| hostA | `ip route` | `10.10.1.0/30 dev vethA ... linkdown` | La ruta existe pero marcada como enlace caído |
+| hostA | `ip neigh` | `10.10.1.2 dev vethA FAILED` | El ARP hacia hostB no tuvo respuesta |
+| hostB | `ip link` | `vethB: <BROADCAST,MULTICAST> state DOWN` | **No aparece `UP`: vethB está apagada** |
+| hostB | `ip addr` | `inet 10.10.1.2/30` | La IP sigue configurada |
+| hostB | `ip route` | *(vacío)* | La ruta desapareció porque la interfaz está apagada |
+
+**Comparación con la predicción:** el ping falló como se esperaba. Pero vethA **no** siguió con `LOWER_UP`: pasó a `NO-CARRIER`. En un veth, `LOWER_UP` solo aparece cuando las dos puntas están encendidas; al apagar vethB, vethA se quedó sin nada al otro lado. La ruta de hostB desapareció, igual que en la sección de puesta en servicio antes de encender la interfaz.
+
+### 4. Causa de la falla
+
+Siguiendo la secuencia de la guía (¿existe el namespace? → ¿existe la interfaz? → ¿está UP?), el problema aparece en el tercer paso: **vethB en hostB estaba apagada** (sin `UP`). hostA mostraba `UP` pero `NO-CARRIER`, lo que indicaba que el problema estaba del otro lado del enlace.
+
+### 5. Acción correctiva
+
+```bash
+sudo ip netns exec hostB ip link set vethB up
+```
+
+### 6. Prueba de recuperación
+
+```text
+hostA ping 10.10.1.2:  4 packets transmitted, 4 received, 0% packet loss
+hostB ip route:        10.10.1.0/30 dev vethB proto kernel scope link src 10.10.1.2
+hostA ip link:         vethA: <BROADCAST,MULTICAST,UP,LOWER_UP> state UP
+```
+
+El ping volvió a funcionar, la ruta de hostB reapareció y vethA recuperó `LOWER_UP`. El primer ping fue un poco más lento (0.136 ms) porque hostA tuvo que volver a resolver la MAC de hostB por ARP.
+
 ## 9. Uso de OpenCode
 
 ## 10. Conclusiones
