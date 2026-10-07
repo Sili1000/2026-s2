@@ -249,6 +249,22 @@ En un enlace Ethernet los paquetes IP viajan dentro de tramas que van dirigidas 
 
 ### Conectividad
 
+```bash
+sudo ip netns exec hostA ping -c 4 10.10.1.2
+sudo ip netns exec hostB ping -c 4 10.10.1.1
+```
+
+| Prueba | Resultado |
+|---|---|
+| hostA → hostB | 4/4 respuestas, 0 % pérdida, RTT promedio 0.099 ms, `ttl=64` |
+| hostB → hostA | 4/4 respuestas, 0 % pérdida, RTT promedio 0.063 ms, `ttl=64` |
+
+Hay conectividad en los dos sentidos.
+
+- Los tiempos (~0.06 ms) son mucho menores que hacia internet (~125 ms) porque los paquetes nunca salen de la laptop: el veth es memoria dentro del mismo kernel.
+- El `ttl=64` llega sin cambios, lo que confirma que no hay ningún router entre los dos nodos.
+- El primer ping de hostA fue más lento (0.243 ms) porque antes tuvo que resolver la MAC de hostB por ARP. En el ping de hostB el primero no fue más lento porque hostB ya había aprendido la MAC de hostA.
+
 ## 7. Captura y análisis de tráfico
 
 ## 8. Falla y diagnóstico
