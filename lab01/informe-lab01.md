@@ -415,9 +415,9 @@ Además de OpenCode, se usó un asistente de IA (Claude) como apoyo para interpr
 
 ## 10. Conclusiones
 
-- Con una sola computadora se pudo armar dos "equipos" (hostA y hostB) y conectarlos con un cable virtual. Cada uno tiene su propia red y no ve la del otro ni la de mi Linux.
-- Se aprendio que no basta con ponerle IP a una interfaz: también hay que encenderla. Mientras estaba apagada no había ruta y no se podía hacer ping.
-- No se necesito gateway porque los dos equipos están en la misma red y unidos directamente por el cable.
-- Para enviar un ping, primero el equipo tiene que saber la MAC del otro. Eso lo vi en tcpdump: primero aparece ARP y después el ping.
-- Cuando se apago vethB, el problema se veía en hostA, pero la causa estaba en hostB. Yo pensaba que vethA seguiría con LOWER_UP, pero no fue así, porque depende de que las dos puntas del cable estén encendidas.
-- OpenCode ayudo a saber qué revisar primero, pero no todo lo que dice la IA es correcto; hay que comprobarlo con lo que muestra la terminal.
+- Con una sola computadora se pudieron armar dos "equipos" (hostA y hostB) y conectarlos con un cable virtual. Cada uno tiene su propia red y no ve la del otro ni la del sistema principal.
+- Se aprendió que no basta con ponerle IP a una interfaz: también hay que encenderla. Mientras estaba apagada no había ruta y no se podía hacer ping.
+- No se necesitó gateway porque los dos equipos están en la misma red y unidos directamente por el cable.
+- Para enviar un ping, primero el equipo tiene que saber la MAC del otro. Eso se vio en tcpdump: primero aparece ARP y después el ping.
+- Cuando se apagó vethB, el problema se veía en hostA, pero la causa estaba en hostB. Se esperaba que vethA siguiera con LOWER_UP, pero no fue así, porque depende de que las dos puntas del cable estén encendidas.
+- OpenCode ayudó a saber qué revisar primero, pero no todo lo que dice la IA es correcto; hay que comprobarlo con lo que muestra la terminal.
