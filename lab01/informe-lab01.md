@@ -366,4 +366,47 @@ El ping volvió a funcionar, la ruta de hostB reapareció y vethA recuperó `LOW
 
 ## 9. Uso de OpenCode
 
+### Problema
+
+Durante la falla controlada, el ping de hostA a hostB daba `Destination Host Unreachable`. Se quiso comprobar si, con las salidas de hostA solamente, OpenCode llegaba a la misma conclusión que el diagnóstico manual.
+
+### Consulta
+
+Se usó OpenCode en modo **Plan** (solo analiza, no ejecuta), con el modelo gratuito Big Pickle:
+
+```text
+Tengo dos network namespaces Linux (hostA y hostB) conectados por un par veth.
+hostA tiene 10.10.1.1/30 en vethA y hostB tiene 10.10.1.2/30 en vethB.
+El ping de hostA a hostB da "Destination Host Unreachable".
+Salidas en hostA:
+ip link:  vethA@if3: <NO-CARRIER,BROADCAST,MULTICAST,UP> state DOWN
+ip route: 10.10.1.0/30 dev vethA proto kernel scope link src 10.10.1.1 linkdown
+ip neigh: 10.10.1.2 dev vethA FAILED
+No ejecutes comandos ni modifiques archivos. No me des la solución completa.
+Indícame qué debería verificar primero y por qué.
+Distingue hechos observables de tus inferencias.
+```
+
+### Propuesta obtenida
+
+- **Hechos:** vethA está administrativamente `UP` pero sin portadora (`NO-CARRIER`, `state DOWN`); la ruta existe pero está `linkdown`; el ARP hacia `10.10.1.2` falló.
+- **Inferencias:** `NO-CARRIER` sugiere que el otro extremo (vethB) no está activo; la ruta `linkdown` y el vecino `FAILED` serían consecuencias del enlace caído, no causas.
+- **Qué verificar primero:** el estado de vethB en hostB, porque un veth necesita las dos puntas en `UP`. En segundo lugar, que el par esté bien emparejado (`@if3`) y en el namespace correcto.
+
+### Verificación
+
+- En hostB, `ip link` mostró vethB **sin `UP`**: se confirma la inferencia principal.
+- Al encender vethB, la ruta `linkdown` y el vecino `FAILED` se corrigieron solos: se confirma que eran consecuencias.
+- El emparejamiento ya se había comprobado en la construcción (`vethA@if3` ↔ `vethB@if4`).
+
+**Comparación con un primer intento:** antes de esta consulta se envió por error un mensaje incompleto. Esa respuesta daba directamente la solución y afirmaba que `Destination Host Unreachable` suele indicar una ruta ausente. Eso **no coincidía con lo observado**: hostA sí tenía la ruta (`linkdown`), y el mensaje aparecía porque el ARP no obtuvo respuesta. Cuando realmente falta la ruta, Linux muestra `Network is unreachable`. Esto muestra que una respuesta de IA hay que contrastarla con las salidas reales.
+
+### Explicación técnica
+
+Un par veth funciona como un cable: `UP` es el estado que configura uno mismo, pero `LOWER_UP` (portadora) depende de que el otro extremo también esté `UP`. Por eso, desde hostA se ve el síntoma (`NO-CARRIER`), pero la causa está en hostB. La ruta y el vecino fallan como consecuencia, no son el origen del problema.
+
+### Otras herramientas de IA
+
+Además de OpenCode, se usó un asistente de IA (Claude) como apoyo para interpretar salidas de comandos y organizar el informe. Cada dato del informe se verificó con las salidas obtenidas en la terminal.
+
 ## 10. Conclusiones
