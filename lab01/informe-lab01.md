@@ -42,6 +42,8 @@ La segunda ruta fue creada automáticamente por el kernel al asignar la direcci�
 
 En la tabla de vecinos el único vecino es el gateway. Su entrada estaba en estado `STALE` y pasó a `REACHABLE` después de un `ping`, porque Linux volvió a confirmar que el gateway responde.
 
+**Observación:** en una primera revisión la MAC de eth0 era `00:15:5d:30:b2:d7` y después cambió a `00:15:5d:30:b8:cd`, probablemente porque WSL se reinició, aunque la IP siguió siendo la misma. Por eso los datos de red en WSL hay que tomarlos en el momento.
+
 ### Prueba de conectividad
 
 | Prueba | Resultado |
@@ -53,6 +55,8 @@ En la tabla de vecinos el único vecino es el gateway. Su entrada estaba en esta
 El primer salto del traceroute coincide con el gateway de la ruta por defecto. Los saltos 4 a 7 usan direcciones privadas (`10.x.x.x`), probablemente de la red interna del proveedor; los últimos pertenecen a la red de Google.
 
 **Pregunta:** si `ping 8.8.8.8` funciona pero `ping google.com` no, se investigaría primero el **DNS**. El ping a una IP demuestra que la interfaz, la dirección, las rutas y el gateway funcionan; lo único adicional que requiere `ping google.com` es traducir el nombre a una dirección IP.
+
+**Caso real durante el laboratorio:** `git pull` se quedó colgado y `ssh -T git@github.com` dio el error `Could not resolve hostname github.com`. Parecía un problema de DNS, pero al hacer `ping -c 4 8.8.8.8` hubo 100 % de pérdida, así que en realidad no había conectividad y el DNS fallaba como consecuencia. Después de un rato la conexión volvió y `ping`, `ssh` y `git pull` funcionaron.
 
 ## 2. Objetivo
 
