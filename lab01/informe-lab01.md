@@ -421,3 +421,101 @@ Además de OpenCode, se usó un asistente de IA (Claude) como apoyo para interpr
 - Para enviar un ping, primero el equipo tiene que saber la MAC del otro. Eso se vio en tcpdump: primero aparece ARP y después el ping.
 - Cuando se apagó vethB, el problema se veía en hostA, pero la causa estaba en hostB. Se esperaba que vethA siguiera con LOWER_UP, pero no fue así, porque depende de que las dos puntas del cable estén encendidas.
 - OpenCode ayudó a saber qué revisar primero, pero no todo lo que dice la IA es correcto; hay que comprobarlo con lo que muestra la terminal.
+
+## Anexo: Reproducción paso a paso
+
+La red (hostA, hostB y el cable) se borra al apagar la computadora o reiniciar WSL. Para volver a armarla, seguir estos pasos **en este orden**.
+
+### 0. Revisar si la red ya existe
+
+```bash
+cd ~/2026-s2
+ip netns list
+```
+
+- Si no aparece nada: seguir desde el paso 1.
+- Si aparecen hostA y hostB: la red ya está armada, saltar al paso 6.
+
+### 1. Crear los dos nodos
+
+```bash
+sudo ip netns add hostA
+sudo ip netns add hostB
+ip netns list
+```
+
+### 2. Mostrar el aislamiento
+
+```bash
+sudo ip netns exec hostA ip link
+```
+
+Solo debe aparecer `lo` apagado (no aparece `eth0`).
+
+### 3. Crear el cable y poner cada punta en su nodo
+
+```bash
+sudo ip link add vethA type veth peer name vethB
+sudo ip link set vethA netns hostA
+sudo ip link set vethB netns hostB
+```
+
+### 4. Asignar las direcciones IP
+
+```bash
+sudo ip netns exec hostA ip addr add 10.10.1.1/30 dev vethA
+sudo ip netns exec hostB ip addr add 10.10.1.2/30 dev vethB
+```
+
+### 5. Encender las interfaces
+
+```bash
+sudo ip netns exec hostA ip link set lo up
+sudo ip netns exec hostA ip link set vethA up
+sudo ip netns exec hostB ip link set lo up
+sudo ip netns exec hostB ip link set vethB up
+```
+
+### 6. Ver la ruta
+
+```bash
+sudo ip netns exec hostA ip route
+```
+
+Debe aparecer `10.10.1.0/30 dev vethA ...` (sin `via`, no hay gateway).
+
+### 7. Probar la conexión
+
+```bash
+sudo ip netns exec hostA ping -c 4 10.10.1.2
+sudo ip netns exec hostA ip neigh
+```
+
+El ping debe dar `0% packet loss` y en vecinos debe aparecer la MAC de hostB.
+
+### 8. Falla controlada (opcional)
+
+```bash
+sudo ip netns exec hostB ip link set vethB down
+sudo ip netns exec hostA ping -c 4 10.10.1.2
+sudo ip netns exec hostA ip link
+sudo ip netns exec hostB ip link
+```
+
+El ping falla. En hostA aparece `NO-CARRIER` (no hay nadie al otro lado) y en hostB vethB no tiene `UP` (esa es la causa).
+
+Restaurar y comprobar:
+
+```bash
+sudo ip netns exec hostB ip link set vethB up
+sudo ip netns exec hostA ping -c 4 10.10.1.2
+```
+
+### Si algo falla
+
+| Error | Qué significa | Qué hacer |
+|---|---|---|
+| `File exists` | Eso ya estaba creado | Seguir con el siguiente paso |
+| `Cannot find device "vethA"` | El cable no existe o ya se movió | Revisar con `sudo ip netns exec hostA ip link` |
+| `Destination Host Unreachable` | No llega al otro equipo | Revisar en orden: ¿existe el nodo? → ¿existe la interfaz? → ¿está UP? → ¿tiene IP? |
+| Pide contraseña | `sudo` necesita permisos | Escribir la contraseña de Linux (no se ve al escribir) |
