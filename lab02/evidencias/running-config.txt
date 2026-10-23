@@ -1,0 +1,20 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.4.4
+frr defaults traditional
+hostname DESKTOP-9JRP8JA
+domainname localdomain
+log syslog informational
+no ip forwarding
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+ip route 198.51.100.0/24 blackhole
+!
+router ospf
+ network 10.10.10.0/24 area 0
+exit
+!
+end

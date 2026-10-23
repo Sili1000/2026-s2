@@ -1,0 +1,4 @@
+default via 172.24.128.1 dev eth0 proto kernel 
+10.10.10.0/24 dev dummy0 proto kernel scope link src 10.10.10.1 
+172.24.128.0/20 dev eth0 proto kernel scope link src 172.24.132.23 
+blackhole 198.51.100.0/24 proto static metric 20 
