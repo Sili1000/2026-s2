@@ -350,7 +350,7 @@ dummy0 is up
 
 ## 17. Uso de IA
 
-Usé un asistente de IA (Claude) para que me explicara los comandos en palabras simples y comparándolos con Cisco IOS, y para ordenar el informe. Las salidas son las que obtuve en mi terminal, y verifiqué cada explicación con ellas. Por ejemplo, el significado de `Cannot stop zebra` lo confirmé recién al leer los logs.
+Usé un asistente de IA (Claude) como apoyo para consultar dudas sobre los comandos y su equivalencia con Cisco IOS. 
 
 ## 18. Conclusiones
 
