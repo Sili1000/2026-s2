@@ -433,13 +433,9 @@ exit
 
 Debe salir `Neighbor Count is 0` y la tabla de vecinos vacía.
 
-### Si algo falla
+### Cosas que me pasaron y hay que recordar
 
-| Error | Qué hacer |
-|---|---|
-| `File exists` al crear dummy0 | Ya existe, seguir al siguiente paso |
-| `ospfd is not running` | Revisar `sudo grep "^ospfd=" /etc/frr/daemons` y `sudo systemctl restart frr` |
-| `active` no aparece | `sudo systemctl restart frr` y ver logs con `sudo journalctl -u frr -n 20 --no-pager` |
-| vtysh no responde a comandos de Linux | Salir con `exit`: dentro de vtysh solo funcionan los comandos de FRR |
-
-No hice la limpieza de la guía (borrar dummy0 y la ruta) para poder hacer la demostración en la defensa.
+- Si un comando sale con `Permission denied`, le faltó `sudo` (me pasó al leer `/etc/frr/daemons`).
+- `sudo vtysh` cambia el indicador a `DESKTOP-9JRP8JA#`. Ahí solo funcionan los comandos de FRR; para volver a Linux se usa `exit`.
+- Si `show ip ospf neighbor` dice `ospfd is not running`, hay que revisar que `ospfd=yes` esté en `/etc/frr/daemons` y reiniciar FRR con `sudo systemctl restart frr`.
+- `Invalid argument` al hacer ping a `198.51.100.10` no es un error, es la ruta blackhole funcionando.
