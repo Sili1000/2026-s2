@@ -13,8 +13,8 @@ En las tablas, cuando no encontré evidencia puse "no verificable", y cuando alg
 |---|---|---|
 | Fibra terrestre 1 | ENTEL, Fibra Óptica al Pacífico: La Paz - Desaguadero (frontera con Perú) - Ilo (Perú). Desde Ilo sigue por fibra submarina hasta Lurín (Lima). Inaugurada en septiembre de 2020. | https://correodelsur.com/sociedad/20200904/inauguran-nueva-fibra-optica-del-estado-y-comprometen-mas-velocidad-de-internet-a-menor-costo.html |
 | Fibra terrestre 2 | ENTEL, Corredor Sudamericano de Telecomunicaciones: Lurín (Perú) - Desaguadero - Puerto Quijarro (frontera con Brasil) - São Paulo. La fuente dice que el tramo Lima - São Paulo funciona desde 2024. | https://dplnews.com/?p=293705 y https://dplnews.com/?p=273092 |
-| Cable submarino 1 | Curie (Google), costa del Pacífico. Estación de amarre: Valparaíso, Chile. | https://www.submarinecablemap.com/submarine-cable/curie |
-| Cable submarino 2 | EllaLink, costa del Atlántico. Estación de amarre: Fortaleza, Brasil. | https://www.submarinecablemap.com/submarine-cable/ellalink |
+| Cable submarino 1 | Curie, costa del Pacífico. Estación de amarre: Valparaíso, Chile (las otras son Balboa, Panamá, y El Segundo, EE. UU.). Según la ficha: dueño Google, en servicio desde 2020 Q2, 10.476 km. | https://www.submarinecablemap.com/submarine-cable/curie |
+| Cable submarino 2 | EllaLink, costa del Atlántico. Estación de amarre: Fortaleza, Brasil (también llega a Sines, Portugal, entre otras). Según la ficha: dueño EllaLink, en servicio desde junio de 2021, 6.200 km. | https://www.submarinecablemap.com/submarine-cable/ellalink |
 
 Los dos tramos terrestres los saqué de noticias sobre Entel; no los contrasté con el mapa de la UIT.
 
