@@ -1,0 +1,89 @@
+Fecha de medición: 2026-11-18 13:59:00 -04
+
+################ DNS ################
+===== impuestos.bo =====
+--- A (con TTL) ---
+--- NS ---
+--- MX ---
+
+===== umsa.bo =====
+--- A (con TTL) ---
+umsa.bo.		3600	IN	A	200.7.161.56
+--- NS ---
+jupiter.umsa.bo.
+marte.umsa.bo.
+--- MX ---
+10 alt3.aspmx.l.google.com.
+5 alt1.aspmx.l.google.com.
+1 aspmx.l.google.com.
+10 alt4.aspmx.l.google.com.
+5 alt2.aspmx.l.google.com.
+
+===== entel.bo =====
+--- A (con TTL) ---
+--- NS ---
+ns.entelnet.bo.
+ns2.entelnet.bo.
+--- MX ---
+0 entel-bo.mail.protection.outlook.com.
+
+===== bcp.com.bo =====
+--- A (con TTL) ---
+bcp.com.bo.		60	IN	A	170.245.35.119
+bcp.com.bo.		60	IN	A	45.232.46.119
+bcp.com.bo.		60	IN	A	45.232.46.204
+--- NS ---
+server29.bcp.com.bo.
+--- MX ---
+10 mxa-004a9b01.gslb.pphosted.com.
+10 mxb-004a9b01.gslb.pphosted.com.
+
+===== impuestos.bo (AAAA, SOA, TXT) =====
+--- AAAA ---
+--- SOA ---
+--- TXT ---
+
+===== umsa.bo (AAAA, SOA, TXT) =====
+--- AAAA ---
+umsa.bo.		60	IN	AAAA	2801:104:dc:a161::a56
+--- SOA ---
+marte.umsa.bo. admdns.umsa.bo. 2022032365 3600 1800 604800 86400
+--- TXT ---
+"globalsign-domain-verification=_OcqRHBtzMJtb4MdYeNUzI_BLHN6RCVxu_vAg6hvAq"
+"google-site-verification=Ffz9Ng_d2C56x0IbsTiRR7baNN_th2_0kV6Nj5tpvLI"
+"google-site-verification=GNNQI-81DolodnPZipTT6vnLFXO32N3zF_IQ82FOT1I"
+"v=spf1 a mx ip4:200.7.160.201 include:spf.mandrillapp.com include:_spf.google.com -all"
+
+===== impuestos.bo A consultado a Cloudflare (1.1.1.1) =====
+
+################ PING ################
+===== ping impuestos.bo =====
+ping: impuestos.bo: Name or service not known
+
+===== ping umsa.bo =====
+
+--- umsa.bo ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4150ms
+rtt min/avg/max/mdev = 6.961/13.047/23.017/5.323 ms
+
+===== ping entel.bo =====
+ping: entel.bo: No address associated with hostname
+
+################ LACNIC RDAP ################
+===== AS6568 =====
+handle: AS6568 | name: 6568
+entidad: ['registrant'] ['EMPRESA NACIONAL DE TELECOMUNICACIONES SOCIEDAD ANONIMA']
+entidad: ['administrative', 'technical', 'abuse'] ['Marco Ballivian Menacho']
+
+===== AS26210 =====
+handle: AS26210 | name: 26210
+entidad: ['registrant'] ['AXS Bolivia S. A.']
+entidad: ['administrative', 'technical', 'abuse'] ['Roberto Loza Guachalla']
+
+################ RIPEstat AS_PATH (prefijo de ENTEL) ################
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 8218 6461 3356 6568
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 48070 61049 174 3356 6568
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 6894 3257 3356 6568
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 31742 1299 12956 6568
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 35266 2914 3356 6568
+London, GB | prefijo: 190.129.0.0/20 | AS_PATH: 917 60068 3356 6568
